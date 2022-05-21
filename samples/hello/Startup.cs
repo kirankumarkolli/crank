@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 
 namespace hello
 {
@@ -37,6 +39,23 @@ namespace hello
             {
                 endpoints.MapGet("/", async context =>
                 {
+                    IHeaderDictionary inputHeaders = context.Request.Headers;
+                    if (inputHeaders != null)
+                    {
+                        StringValues authHeaderValue;
+                        StringValues dateHeaderValue;
+
+                        inputHeaders.TryGetValue("authorization", out authHeaderValue);
+                        inputHeaders.TryGetValue("x-ms-date", out dateHeaderValue);
+
+                        if (string.IsNullOrWhiteSpace(authHeaderValue) 
+                            || string.IsNullOrWhiteSpace(dateHeaderValue))
+                        {
+                            context.Response.StatusCode = 400;
+                            return;
+                        }
+                    }
+
                     await context.Response.WriteAsync("Hello World!");
                 });
             });
