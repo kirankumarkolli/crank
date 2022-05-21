@@ -48,8 +48,8 @@ namespace hello
                         inputHeaders.TryGetValue("authorization", out authHeaderValue);
                         inputHeaders.TryGetValue("x-ms-date", out dateHeaderValue);
 
-                        if (string.IsNullOrWhiteSpace(authHeaderValue) 
-                            || string.IsNullOrWhiteSpace(dateHeaderValue))
+                        if (authHeaderValue.Count != 1
+                            || dateHeaderValue.Count != 1)
                         {
                             context.Response.StatusCode = 400;
                             return;
